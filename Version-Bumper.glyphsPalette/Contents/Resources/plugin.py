@@ -11,8 +11,8 @@ PREF_KEY = "com.rsztype.RSZVersionBumper.enabled"
 
 
 # ----------------------------------------------------------------------
-# Motore condiviso: un solo osservatore dell'export per tutta l'app,
-# a prescindere da quante finestre/palette sono aperte.
+# Shared engine: a single export observer for the entire app,
+# regardless of how many windows/palettes are open.
 # ----------------------------------------------------------------------
 class _RSZBumpEngine(NSObject):
 
@@ -23,10 +23,10 @@ class _RSZBumpEngine(NSObject):
 
 	def documentExported_(self, notification):
 		try:
-			if not Glyphs.defaults[PREF_KEY]:      # switch OFF -> non fa nulla
+			if not Glyphs.defaults[PREF_KEY]:      # switch OFF -> does nothing
 				return
 			now = NSDate.date().timeIntervalSince1970()
-			if now - self.lastBump < 10.0:         # debounce per batch di instances
+			if now - self.lastBump < 10.0:         # debounce for batch of instances
 				return
 			self.lastBump = now
 
@@ -39,16 +39,16 @@ class _RSZBumpEngine(NSObject):
 				font.versionMajor += 1
 				font.versionMinor = 0
 
-			if font.parent:                        # scrive nel pannello Info e salva
+			if font.parent:                        # updates Info panel and saves
 				font.parent.saveDocument_(None)
 
 			Glyphs.showNotification(
 				"RSZ Version Bumper",
-				"Versione \u2192 %d.%03d" % (font.versionMajor, font.versionMinor)
+				"Version \u2192 %d.%03d" % (font.versionMajor, font.versionMinor)
 			)
-		except:
+		except Exception as e:
 			import traceback
-			print(traceback.format_exc())
+			print(f"RSZ Version Bumper error: {traceback.format_exc()}")
 
 
 _engine = None
@@ -64,7 +64,7 @@ def _ensure_engine():
 
 
 # ----------------------------------------------------------------------
-# Palette: l'interruttore nella colonna di destra.
+# Palette: the switch in the right-hand inspector column.
 # ----------------------------------------------------------------------
 class RSZVersionBumperPalette(PalettePlugin):
 
@@ -81,7 +81,7 @@ class RSZVersionBumperPalette(PalettePlugin):
 		groupView = self.paletteView.group.getNSView()
 		groupView.setAutoresizingMask_(NSViewWidthSizable)
 
-		# interruttore macOS (NSSwitch), recuperato in modo sicuro
+		# macOS switch (NSSwitch), safely retrieved
 		try:
 			NSSwitch = objc.lookUpClass("NSSwitch")
 		except Exception:
@@ -100,7 +100,7 @@ class RSZVersionBumperPalette(PalettePlugin):
 
 	@objc.python_method
 	def start(self):
-		_ensure_engine()   # registra l'osservatore una sola volta
+		_ensure_engine()   # registers the observer only once
 
 	def toggle_(self, sender):
 		Glyphs.defaults[PREF_KEY] = bool(sender.state())
@@ -110,7 +110,7 @@ class RSZVersionBumperPalette(PalettePlugin):
 		"""Please leave this method unchanged"""
 		return __file__
 
-	# Fix di compatibilita: Glyphs chiama questi metodi sulle palette.
+	# Compatibility fix: Glyphs calls these methods on palettes.
 	_sortID = 0
 
 	@objc.python_method
