@@ -9,11 +9,8 @@ After installation, it adds an **Auto-bump** switch to the palette area on the r
 ### Installation
 
 1. Unzip the download and double-click `RSZ Version Bumper.glyphsPalette` — Glyphs will offer to install it. (Alternatively, drop it into `~/Library/Application Support/Glyphs 3/Plugins/`.)
-2. If macOS blocks it as quarantined, run in Terminal:
-   ```
-   xattr -dr com.apple.quarantine ~/"Library/Application Support/Glyphs 3/Plugins/RSZ Version Bumper.glyphsPalette"
-   ```
-3. Restart Glyphs.app.
+
+2. Restart Glyphs.app.
 
 ### Usage Instructions
 
